@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0",
+  "flags": {
+    "platform_api": {
+      "enabled": true,
+      "default_variant": "v1",
+      "prerequisites": [],
+      "rules": [
+        {
+          "id": "rule-modern-client",
+          "variant": "v2",
+          "conditions": [
+            {
+              "attribute": "app_version",
+              "operator": "semver_gte",
+              "value": "1.2.0"
+            }
+          ]
+        }
+      ],
+      "rollout": null
+    },
+    "checkout": {
+      "enabled": true,
+      "default_variant": "legacy",
+      "prerequisites": [
+        {
+          "flag_key": "platform_api",
+          "variant": "v2"
+        }
+      ],
+      "rules": [
+        {
+          "id": "rule-enterprise-br",
+          "variant": "one_click",
+          "conditions": [
+            {
+              "attribute": "plan_tier",
+              "operator": "equals",
+              "value": "enterprise"
+            },
+            {
+              "attribute": "region",
+              "operator": "in",
+              "value": ["br-south", "br-southeast"]
+            },
+            {
+              "attribute": "app_version",
+              "operator": "semver_gte",
+              "value": "1.10.0"
+            }
+          ]
+        },
+        {
+          "id": "rule-high-volume-pro",
+          "variant": "express",
+          "conditions": [
+            {
+              "attribute": "plan_tier",
+              "operator": "equals",
+              "value": "pro"
+            },
+            {
+              "attribute": "monthly_orders",
+              "operator": "numeric_gte",
+              "value": 100
+            }
+          ]
+        }
+      ],
+      "rollout": {
+        "salt": "spring-2026",
+        "weights": [
+          {
+            "variant": "express",
+            "weight_bps": 2500
+          },
+          {
+            "variant": "legacy",
+            "weight_bps": 7500
+          }
+        ]
+      }
+    },
+    "instant_settlement": {
+      "enabled": true,
+      "default_variant": "disabled",
+      "prerequisites": [
+        {
+          "flag_key": "checkout",
+          "variant": "one_click"
+        }
+      ],
+      "rules": [
+        {
+          "id": "rule-verified-volume",
+          "variant": "enabled",
+          "conditions": [
+            {
+              "attribute": "monthly_orders",
+              "operator": "numeric_gt",
+              "value": 20
+            }
+          ]
+        }
+      ],
+      "rollout": null
+    },
+    "seasonal_banner": {
+      "enabled": false,
+      "default_variant": "hidden",
+      "prerequisites": [],
+      "rules": [
+        {
+          "id": "rule-all-regions",
+          "variant": "shown",
+          "conditions": [
+            {
+              "attribute": "region",
+              "operator": "not_in",
+              "value": ["restricted"]
+            }
+          ]
+        }
+      ],
+      "rollout": null
+    }
+  }
+}

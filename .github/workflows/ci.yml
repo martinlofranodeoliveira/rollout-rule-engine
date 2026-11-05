@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: ruby:3.4-bookworm
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Verify Ruby runtime
+        run: ruby --version
+
+      - name: Run test suite
+        run: ruby -Ilib:test test/run_tests.rb
+
+      - name: Run deterministic offline demo
+        run: ruby -Ilib bin/rollout-engine demo

@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "rollout_rule_engine"
+
+exit(RolloutRuleEngine::CLI.run(ARGV))
